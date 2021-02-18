@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="klevu" translate="label" sortOrder="220">
+            <label>Klevu</label>
+        </tab>
+        <section id="klevu_troubleshoot" translate="label" sortOrder="999" showInDefault="1" showInWebsite="0" showInStore="0">
+            <class>separator-top</class>
+            <label>Data Sync Troubleshooter</label>
+            <tab>klevu</tab>
+            <resource>Klevu_Search::config_search</resource>
+            <group id="troubleshoot_field" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                <frontend_model>Klevu\Troubleshoot\Block\Adminhtml\System\Config\TroubleshootField</frontend_model>
+            </group>
+        </section>
+    </system>
+</config>

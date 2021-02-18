@@ -1,0 +1,71 @@
+.kl-mage-finding {
+    clear: both;
+    color: #0a0a0a;
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: .025em;
+    padding: 1.9rem 2.8rem 1.9rem 0;
+    position: relative;
+    text-decoration: none;
+    transition: color .15s linear;
+}
+
+.kl-mage-tablecontent {
+    margin-top: 10px;
+}
+
+.kl-mage-troubleshoot-result ul li {
+    margin-top: 1em;
+    margin-left: 2em;
+    font-size: 1.6rem;
+}
+
+.kl-mage-troubleshoot-result .error,
+.kl-mage-finding-empty.error {
+    color: #e22626;
+    font-weight: 600;
+}
+
+.kl-mage-troubleshoot-result .success {
+    color: #79a22e;
+    font-weight: 600;
+}
+
+.kl-mage-troubleshoot-result .warning {
+    color: #e22626;
+    font-weight: 600;
+}
+
+.kl-mage-troubleshoot-result h2 {
+    margin: 1em 0 2rem;
+}
+
+.kl-mage-notes .message {
+    padding: 1.8rem 1rem 1.8rem 1rem;
+
+}
+
+.kl-mage-notes ul.message li {
+    font-size: 1.4rem;
+}
+
+.kl-mage-notes .message:before,
+.kl-mage-message:before {
+    content: '';
+}
+
+table.kl-mage-synctable.data-table .tooltip-toggle,
+.kl-mage-underline .tooltip-toggle {
+    border-bottom: 1px dotted black;
+}
+
+/* override Magento default tooltip styles */
+.kl-mage-troubleshoot-result .tooltip {
+    margin-left: 0;
+}
+
+.kl-mage-troubleshoot-result .tooltip-content {
+    font-size: 13px;
+    font-weight: 600;
+}

@@ -1,0 +1,138 @@
+<?php
+/**
+ * Troubleshoot Result template
+ *
+ * @var $block \Klevu\Troubleshoot\Block\Adminhtml\TroubleshootResult
+ */
+?>
+<?php $product_id = $block->getData('product_id'); ?>
+<div class="kl-mage-troubleshoot-result">
+    <?php $product = $block->getCatalogProduct(); ?>
+    <?php if ($product_id <= 0 || empty($product)): ?>
+        <span class="kl-mage-finding-empty error"><?= $block->escapeHtml(__('Product with ID: %1 not found or invalid.', $product_id)) ?></span>
+    <?php elseif ($block->isConfigurable()): ?>
+        <span class="kl-mage-finding-empty error"><?= $block->escapeHtml(__('Product with ID: %1 is a Configurable Product, please enter one of its Child/Variant IDs.', $product_id)) ?></span>
+    <?php else: ?>
+        <span class="kl-mage-finding"><?= $block->escapeHtml(__('Product ID: %1', $product_id)) ?></span>
+        <ul>
+            <li class="kl-mage-underline"><?= __('When was the product last updated in Magento?') ?>
+                <span class="tooltip">
+                        <span class="tooltip-toggle success"><?= $block->getLastUpdatedAt() ?></span>
+                        <span class="tooltip-content"><?php echo __('This value comes from your database so the timezone may be different.'); ?></span>
+                    </span>
+                <br/><small><?php echo __('This is the <strong>catalog_product_entity: updated_at</strong> database value. Klevu compares this to the \'Last Klevu Sync\' below to determine if the product has changed since the last sync.'); ?></small>
+            </li>
+            <li><?= __('Does the product have a price index value?') ?>
+                <?php $indexPrice = $block->isExistsInCatalogProductIndexPrice(); ?>
+                <?php $stockStatusText = $block->getCatalogProductIndexPriceText($indexPrice); ?>
+                <span class="<?= $block->getCellClassName($indexPrice) ?>"><?= $block->getCellAttLabel($indexPrice) ?> <?= $stockStatusText ?></span>
+                <br/><small><?php echo __('This checks whether the product can be found in the <strong>catalog_product_index_price</strong> table. If the product is missing from this native Magento table, it can indicate a reindex requirement or an integrity issue in your data.'); ?></small>
+            </li>
+            <li><?= __('Does the product load correctly?') ?>
+                <?php $objectMethodNote = ''; ?>
+                <?php if ($block->getCollectionMethodStatus()): ?>
+                    <?php $loadableStatus = $block->getProductLoadableStatus(); ?>
+                    <span class="<?= $block->getCellClassName($loadableStatus) ?>"><?= $block->getCellAttLabel($loadableStatus) ?></span>
+                <?php else: ?>
+                    <span class="success"><?= __('Yes (using Object Method)') ?></span>
+                    <?php $objectMethodNote = __('We detected you are using <a href="%1" target="_blank">Object Method</a>. You may wish to try <a href="%1" target="_blank">Collection Method</a> to speed up your data sync with Klevu.', 'https://support.klevu.com/knowledgebase/enabling-collection-method-to-sync-data-magento-2/'); ?>
+                <?php endif; ?>
+                <br/><small><?php echo __('Klevu will not be able to sync the product if it cannot be loaded, so please check the other elements of this report for more clues on why this might be. ') . $objectMethodNote; ?></small>
+            </li>
+        </ul>
+        <br/>
+        <?php $itemGroupCollection = $block->getParentInfo(); ?>
+        <?php if ($itemGroupCollection): ?>
+            <div class="kl-mage-tablecontent">
+                <table class="kl-mage-synctable data-table">
+                    <thead>
+                    <tr>
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'ID',
+                            'content' => 'The Klevu unique identifier for this product.',
+                        ])?>
+
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'Type',
+                            'content' => 'The Product Type, eg. Simple, Configurable, etc.',
+                        ])?>
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'Status',
+                            'content' => 'Whether the Product is Enabled or Disabled for this Store View.',
+                        ])?>
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'Visibility',
+                            'content' => 'The Product Visibility in this Store View, eg. Catalog, Search, etc.',
+                        ])?>
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'Last Klevu Sync',
+                            'content' => 'The time and date this Product was last synced with Klevu.',
+                        ]) ?>
+                        <?= $block->getTableHeadRowHtml([
+                            'label' => 'Next Klevu action',
+                            'content' => 'The next action the Klevu extension determines is required for this Product, eg. add, update or delete.',
+                        ]) ?>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($itemGroupCollection as $key => $value): ?>
+
+                        <?php $trClass = $value['notSyncable'] ? __('kl-notsyncable') : __('kl-syncable'); ?>
+                        <tr class="<?= $trClass ?>">
+                            <!-- Product ID -->
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\ItemGroupId::class)
+                                ->setTableCell($value['itemGroupId'],$product_id)->toHtml() ?>
+
+                            <!-- Product type -->
+                            <?php $type = $value['productType']; ?>
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\Type::class)
+                                ->setTableCell($value['productType'])->toHtml() ?>
+
+                            <!-- Product status -->
+                            <?php $status = $value['productStatus']; ?>
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\Status::class)
+                                ->setTableCell($value['productStatus'])->toHtml() ?>
+
+                            <!-- Visibility -->
+                            <?php $visibility = $value['productVisibility']; ?>
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\Visibility::class)
+                                ->setTableCell($value['productVisibility'])->toHtml()?>
+
+                            <!-- Product last sync -->
+                            <?php $lastSync = $value['lastSyncKlevu']; ?>
+                            <?php $updatedAt = $value['productUpdatedAt']; ?>
+
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\LastSync::class)
+                                ->setTableCell($value['lastSyncKlevu'], $value['productUpdatedAt'], $value['notSyncable'])->toHtml() ?>
+
+                            <!-- Product next action -->
+                            <?= $block->getLayout()->createBlock(\Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\NextAction::class)
+                                ->setTableCell($value['nextAction'], $value['notSyncable'])->toHtml() ?>
+                        </tr>
+
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <br/>
+            <div class="kl-mage-notes">
+                <ul class="message kl-mage-message">
+                    <li>
+                        <span class="success">Green</span> = Everything appears to be OK!
+                    </li>
+                    <li>
+                        <span class="warning">Red</span> = Something to check on your side,
+                        please liaise with your internal technical team before contacting support.
+                    </li>
+                    <li>
+                        If you still have problems, please
+                        <strong>take a screenshot</strong> of this screen and send to
+                        <a href="mailto:support@klevu.com">Klevu Support</a> to investigate further.
+
+                    </li>
+                </ul>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+
+</div>

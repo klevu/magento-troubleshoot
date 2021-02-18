@@ -1,0 +1,10 @@
+<th>
+    <?php if (!empty($block->getContent())): ?>
+        <span class="tooltip">
+            <span class="tooltip-toggle"><?= $block->getLabel() ?></span>
+            <span class="tooltip-content"><?= $block->getContent() ?></span>
+        </span>
+    <?php else: ?>
+        <?= $block->getLabel() ?>
+    <?php endif; ?>
+</th>

@@ -1,0 +1,67 @@
+<form id="klevu_search_troubleshoot_product_form"
+      class="form"
+      data-mage-init='{"validation": {}}'
+      action="<?php echo $block->getFormActionUrl() ?>" method="POST">
+
+    <div class="klevu_troubleshoot_product_form admin__collapsible-block">
+        <input type="hidden" name="form_key" value="<?php echo $block->getFormKey() ?>"/>
+
+        <a><?php echo __('Data Sync Troubleshooter') ?></a>
+
+        <fieldset class="fieldset">
+            <div class="field required">
+                <label for="kl_store_id" class="label"><span><?php echo __('Store View') ?></span></label>
+                <div class="control">
+                    <select name="kl_store_id" class="input-select select required-entry validate-select" id="kl_store_id" data-validate="{required:true}">
+                        <?php $data = $block->getStoreSelectData() ?>
+                        <?php foreach ($data as $website => $groups): ?>
+                            <optgroup label="<?php echo $block->escapeHtml($website) ?>"></optgroup>
+                            <?php foreach ($groups as $group => $stores): ?>
+                                <optgroup label="&nbsp;&nbsp;<?php echo $block->escapeHtml($group) ?>">
+                                    <?php foreach ($stores as $store): ?>
+                                        <?php /** @var \Magento\Framework\Model\Store $store */ ?>
+                                        <option value="<?php echo $store->getId() ?>">
+                                            &nbsp;&nbsp;&nbsp&nbsp;<?php echo $block->escapeHtml($store->getName()) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="note"><span>Select the Store View you would like to check for data sync issues. Only stores with a valid Klevu configuration will appear in this list.</span></p>
+                </div>
+            </div>
+
+            <div class="field required">
+                <label for="kl_product_id" class="label"><span><?php echo __('Product ID') ?></span></label>
+                <div class="control">
+                    <input type="text" name="kl_product_id" id="kl_product_id" class="input-text required-entry" placeholder="Enter a Product ID, eg. 123">
+                    <p class="note"><span>Enter the ID of a Product you would like to check, eg. 123. For Configurable products, please enter one of it's Child/Variant IDs rather than the Parent ID.</span></p>
+                </div>
+            </div>
+
+            <div class="field"><label class="label"></label>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button type="button" title="Submit" class="action submit primary" id="kl_troubleshoot_submit_button">
+                            <span>Submit</span>
+                        </button>
+                        <input type="reset" class="action abs-action-primary" title="Reset" id="kl_troubleshoot_reset_button"/>
+                    </div>
+                </div>
+            </div>
+
+        </fieldset>
+    </div>
+</form>
+
+<div id="kl_troubleshoot_error" class="kl-mage-finding-empty error"></div>
+<div id="kl_troubleshoot_response">&nbsp;</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Klevu_Troubleshoot/js/dataTroubleshoot":{
+                "url":"<?= $block->escapeUrl($block->getFormActionUrl()) ?>"
+            }
+        }
+    }
+</script>

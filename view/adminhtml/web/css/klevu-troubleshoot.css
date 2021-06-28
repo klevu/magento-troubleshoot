@@ -69,3 +69,8 @@ table.kl-mage-synctable.data-table .tooltip-toggle,
     font-size: 13px;
     font-weight: 600;
 }
+.kl-mage-troubleshoot-introtext{
+    margin-top: 1em;
+    margin-bottom: 2em;
+    line-height: 1.5em;
+}

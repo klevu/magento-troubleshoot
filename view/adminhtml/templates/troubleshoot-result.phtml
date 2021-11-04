@@ -35,7 +35,7 @@
                     <span class="<?= $block->getCellClassName($loadableStatus) ?>"><?= $block->getCellAttLabel($loadableStatus) ?></span>
                 <?php else: ?>
                     <span class="success"><?= __('Yes (using Object Method)') ?></span>
-                    <?php $objectMethodNote = __('We detected you are using <a href="%1" target="_blank">Object Method</a>. You may wish to try <a href="%1" target="_blank">Collection Method</a> to speed up your data sync with Klevu.', 'https://support.klevu.com/knowledgebase/enabling-collection-method-to-sync-data-magento-2/'); ?>
+                    <?php $objectMethodNote = __('We detected you are using <a href="%1" target="_blank">Object Method</a>. You may wish to try <a href="%1" target="_blank">Collection Method</a> to speed up your data sync with Klevu.', 'https://help.klevu.com/support/solutions/articles/5000871455-sync-data-using-collection-method/'); ?>
                 <?php endif; ?>
                 <br/><small><?php echo __('Klevu will not be able to sync the product if it cannot be loaded, so please check the other elements of this report for more clues on why this might be. ') . $objectMethodNote; ?></small>
             </li>

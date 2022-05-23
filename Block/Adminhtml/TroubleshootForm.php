@@ -1,12 +1,12 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml;
-
 
 use Klevu\Search\Helper\Config as KlevuConfig;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Api\Data\StoreInterface;
 
 /**
  * Class TroubleshootForm
@@ -14,11 +14,12 @@ use Magento\Backend\Block\Template\Context;
  */
 class TroubleshootForm extends Template
 {
+    const FORM_ACTION_URL = "klevu_troubleshoot/troubleshoot/post";
+
     /**
      * @var KlevuConfig
      */
     private $_searchHelperConfig;
-
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
@@ -34,8 +35,7 @@ class TroubleshootForm extends Template
         Context $context,
         KlevuConfig $searchHelperConfig,
         array $data = []
-    )
-    {
+    ) {
         $this->_searchHelperConfig = $searchHelperConfig;
         $this->_storeManager = $context->getStoreManager();
         parent::__construct($context, $data);
@@ -48,23 +48,25 @@ class TroubleshootForm extends Template
      */
     public function getFormActionUrl()
     {
-        return $this->getUrl("klevu_troubleshoot/troubleshoot/post");
+        return $this->getUrl(self::FORM_ACTION_URL);
     }
 
     /**
      * Returns only Klevu configured stores
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getStoreSelectData()
     {
         $data = [];
         $stores = $this->_storeManager->getStores(false);
         foreach ($stores as $store) {
-            /** @var \Magento\Framework\Model\Store $store */
-            if (!$this->_searchHelperConfig->getJsApiKey($store)
-                || !$this->_searchHelperConfig->getRestApiKey($store)) {
+            /** @var StoreInterface $store */
+            if (
+                !$this->_searchHelperConfig->getJsApiKey($store)
+                || !$this->_searchHelperConfig->getRestApiKey($store)
+            ) {
                 // Skipping non-configured stores
                 continue;
             }

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
 use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
@@ -21,6 +20,7 @@ class NextAction extends Cell
         $this->setNotSyncable($notSyncable);
         $this->prepareLabel($value);
         $this->prepareClassName($value);
+        
         return $this;
     }
 
@@ -61,6 +61,4 @@ class NextAction extends Cell
         $this->prepareContent($content);
         $this->setClassName($className);
     }
-
-
 }

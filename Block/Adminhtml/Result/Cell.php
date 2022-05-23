@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result;
-
 
 use Klevu\Troubleshoot\Block\Adminhtml\TroubleshootResult;
 
@@ -12,7 +10,6 @@ use Klevu\Troubleshoot\Block\Adminhtml\TroubleshootResult;
  */
 class Cell extends TroubleshootResult
 {
-
     /**
      * Setting template
      */

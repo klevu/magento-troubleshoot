@@ -1,17 +1,11 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
 use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
-/**
- * Class ItemGroupId
- * @package Klevu\Troubleshoot\Block\Adminhtml\Result\Cell
- */
 class ItemGroupId extends Cell
 {
-
     /**
      * @param $value
      * @param null $product_id
@@ -22,6 +16,7 @@ class ItemGroupId extends Cell
         $this->prepareLabel($value);
         $this->setMainProductId($product_id);
         $this->prepareClassName($value);
+
         return $this;
     }
 
@@ -32,7 +27,7 @@ class ItemGroupId extends Cell
      */
     public function prepareClassName($value)
     {
-        $className = $this->getCellClassName($value, true);
+        $className = $this->getCellClassName($value);
         if (empty($value)) {
             $className = 'warning';
         }
@@ -44,6 +39,4 @@ class ItemGroupId extends Cell
         $this->prepareContent($content);
         $this->setClassName($className);
     }
-
-
 }

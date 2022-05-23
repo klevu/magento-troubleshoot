@@ -17,8 +17,6 @@ use Magento\Store\Model\StoreManagerInterface as Klevu_StoreManagerInterface;
  */
 class TroubleshootContext extends DataObject
 {
-
-
     /**
      * TroubleshootContext constructor.
      * @param Klevu_HelperManager $helperManager
@@ -39,7 +37,7 @@ class TroubleshootContext extends DataObject
         Magento_OptionProvider $magentoOptionProvider
     )
     {
-        $data = array(
+        $data = [
             'helper_manager' => $helperManager,
             'resource_connection' => $resourceConnection,
             'store_manager_interface' => $storeManagerInterface,
@@ -47,9 +45,7 @@ class TroubleshootContext extends DataObject
             'klevu_product_individual' => $klevuProductIndividual,
             'klevu_product_parent' => $klevuProductParent,
             'magento_option_provider' => $magentoOptionProvider
-        );
+        ];
         parent::__construct($data);
     }
-
-
 }

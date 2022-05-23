@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
 use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
@@ -23,6 +22,7 @@ class LastSync extends Cell
         $this->setNotSyncable($notSyncable);
         $this->prepareLabel($value);
         $this->prepareClassName($value);
+
         return $this;
     }
 
@@ -46,7 +46,7 @@ class LastSync extends Cell
     {
         $className = $value !== '0000-00-00 00:00:00' ? 'success' : 'warning';
         $timezoneComment = __('This value comes from your database so the timezone may be different.');
-        
+
         if (empty($value)) {
             $className = 'warning';
             $content = __('This product was not found in the klevu_product_sync table.');
@@ -61,12 +61,10 @@ class LastSync extends Cell
         } else {
             $content = $timezoneComment;
         }
-        
+
         /* wont show last sync data if product is notSyncable and if all three flags are missing on STORE LEVEL */
         //$className = $value == 'NONE' ? __('notapply') : $className;
         $this->prepareContent($content);
         $this->setClassName($className);
     }
-
-
 }

@@ -3,12 +3,20 @@
 namespace Klevu\Troubleshoot\Block\Adminhtml;
 
 use Klevu\Search\Model\Product\ProductIndividualInterface as KlevuSearch_ProductIndividual;
+use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\ItemGroupId;
+use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\LastSync;
+use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\NextAction;
+use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\Type;
+use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell\Visibility;
 use Klevu\Troubleshoot\Model\Troubleshoot as TroubleshootModel;
 use Klevu\Troubleshoot\Model\TroubleshootActions;
 use Klevu\Troubleshoot\Model\TroubleshootLoadAttribute;
 use Magento\Backend\Block\Template;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Class TroubleshootResult
@@ -16,16 +24,25 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
  */
 class TroubleshootResult extends Template
 {
+    /**
+     * @var ProductInterface
+     */
     private $product;
-
+    /**
+     * @var TroubleshootModel
+     */
     private $troubleshootModel;
-
-    private $troubleshootProductAction;
-
+    /**
+     * @var TroubleshootLoadAttribute
+     */
     private $troubleshootLoadAttribute;
-
+    /**
+     * @var KlevuSearch_ProductIndividual
+     */
     private $searchProductIndividual;
-
+    /**
+     * @var bool
+     */
     private $outOfStockFlag = false;
 
     /**
@@ -44,12 +61,10 @@ class TroubleshootResult extends Template
         TroubleshootLoadAttribute $troubleshootLoadAttribute,
         TroubleshootActions $troubleshootProductAction,
         array $data = []
-    )
-    {
+    ) {
         $this->searchProductIndividual = $searchProductIndividual;
         $this->troubleshootModel = $troubleshootModel;
         $this->troubleshootLoadAttribute = $troubleshootLoadAttribute;
-        $this->troubleshootProductAction = $troubleshootProductAction;
         parent::__construct($context, $data);
     }
 
@@ -85,7 +100,7 @@ class TroubleshootResult extends Template
      * Returns parent product information
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getParentInfo()
     {
@@ -101,7 +116,6 @@ class TroubleshootResult extends Template
     {
         return (int)$this->troubleshootModel->isExistsInCatalogProductIndexPrice($this->getProductId());
     }
-
 
     /**
      * Returns update_at from catalog_product_entity
@@ -136,21 +150,16 @@ class TroubleshootResult extends Template
     /**
      * Checks whether product type id is supported by Klevu or not
      *
-     * @param string $type_id
+     * @param string $typeId
+     *
      * @return bool
      */
-    public function isProductTypeIdAllowedForSync($type_id)
+    public function isProductTypeIdAllowedForSync($typeId)
     {
-        if ($type_id == Configurable::TYPE_CODE) {
-            return true;
-        }
+        $productTypes = $this->searchProductIndividual->getProductIndividualTypeArray();
+        $productTypes[] = Configurable::TYPE_CODE;
 
-        //checking only individual types only
-        $types = $this->searchProductIndividual->getProductIndividualTypeArray();
-        if (in_array($type_id, $types)) {
-            return true;
-        }
-        return false;
+        return in_array($typeId, $productTypes, true);
     }
 
     /**
@@ -199,36 +208,38 @@ class TroubleshootResult extends Template
      *
      * @param $data
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getTableHeadRowHtml($data)
     {
-        return $this->getLayout()->createBlock(\Magento\Backend\Block\Template::class)
-            ->setTemplate('Klevu_Troubleshoot::result/row/head.phtml')
-            ->addData($data)
-            ->toHtml();
+        $layout = $this->getLayout();
+        $block = $layout->createBlock(Template::class);
+        $block->setTemplate('Klevu_Troubleshoot::result/row/head.phtml');
+        $block->addData($data);
+
+        return $block->toHtml();
     }
 
     /**
      * Get "display out of stock" setting text
      *
      * @param $indexPrice
-     * @return string|void
+     * @return string
      */
     public function getCatalogProductIndexPriceText($indexPrice)
     {
         //wont show if index_price has rows or status is disabled
-        if ($indexPrice || (int)$this->product->getStatus() === 2) {
-            return;
+        if ($indexPrice || (int)$this->product->getStatus() === Status::STATUS_DISABLED) {
+            return '';
         }
 
         //No for 'Display Out of Stock Products' AND 'Stock Status' is OOS then only
         if (!$this->getDisplayOutofstockStatus() && !$this->getProductStockStatus()) {
             $this->outOfStockFlag = true;
             return " (out of stock)";
-        } else {
-            return;
         }
+
+        return '';
     }
 
     /**
@@ -244,8 +255,6 @@ class TroubleshootResult extends Template
     /**
      * Returns product stock status
      *
-     * @param $product_id
-     * @param null $store_id
      * @return int|void
      */
     public function getProductStockStatus()
@@ -261,5 +270,92 @@ class TroubleshootResult extends Template
     public function isCatalogVisibilityEnabled()
     {
         return $this->troubleshootModel->getCatalogVisibilityStatus();
+    }
+
+    /**
+     * @param string $itemGroupId
+     * @param string $productId
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getProductIdTableCell($itemGroupId, $productId)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(ItemGroupId::class);
+        $block->setTableCell($itemGroupId, $productId);
+
+        return $block->toHtml();
+    }
+
+    /**
+     * @param string $productType
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getProductTypeTableCell($productType)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(Type::class);
+        $block->setTableCell($productType);
+
+        return $block->toHtml();
+    }
+
+    /**
+     * @param $status
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getStatusTableCell($status)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(Result\Cell\Status::class);
+        $block->setTableCell($status);
+
+        return $block->toHtml();
+    }
+
+    /**
+     * @param $visibility
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getVisibilityTableCell($visibility)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(Visibility::class);
+        $block->setTableCell($visibility);
+
+        return $block->toHtml();
+    }
+
+    /**
+     * @param string $lastSyncKlevu
+     * @param string $productUpdatedAt
+     * @param bool $notSyncable
+     *
+     * @return string
+     * @throws LocalizedException
+     */
+    public function getLastSyncTableCell($lastSyncKlevu, $productUpdatedAt, $notSyncable)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(LastSync::class);
+        $block->setTableCell($lastSyncKlevu, $productUpdatedAt, $notSyncable);
+
+        return $block->toHtml();
+    }
+
+    public function getNextActionTableCell($nextAction, $notSyncable)
+    {
+        $layout = $this->getLayout();
+        $block =$layout->createBlock(NextAction::class);
+        $block->setTableCell($nextAction, $notSyncable);
+
+        return $block->toHtml();
     }
 }

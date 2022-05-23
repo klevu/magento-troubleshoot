@@ -2,6 +2,7 @@
 
 namespace Klevu\Troubleshoot\Model;
 
+use Klevu\Search\Helper\Config as ConfigHelper;
 use Klevu\Search\Model\Product\ProductParentInterface as Klevu_ProductParentInterface;
 use Klevu\Troubleshoot\Model\TroubleshootActions as Klevu_TroubleshootProductAction;
 use Klevu\Troubleshoot\Model\TroubleshootContext as Klevu_TroubleshootContext;
@@ -10,93 +11,57 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status as Magento_StatusAttribute;
 use Magento\Catalog\Model\Product\Visibility as Magento_VisibilityAttribute;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Model\AbstractModel as AbstractModel;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 
-/**
- * Class Troubleshoot
- * @package Klevu\Troubleshoot\Model
- */
 class Troubleshoot extends AbstractModel
 {
     /**
-     * @var
+     * @var ProductInterface
      */
     private $product;
-
     /**
-     * @var
+     * @var int|string
      */
     private $storeId;
-
-    /**
-     * @var
-     */
-    private $productId;
-
-    /**
-     * @var
-     */
-    private $parentIds;
-
     /**
      * @var Klevu_ProductParentInterface
      */
     private $klevuProductParent;
-
     /**
      * @var TroubleshootActions
      */
     private $troubleshootProductAction;
-
     /**
      * @var ProductRepositoryInterface
      */
     private $productRepository;
-
     /**
      * @var Magento_StatusAttribute
      */
     private $magentoStatusAttribute;
-
     /**
-     * @var
+     * @var ResourceConnection
      */
     private $_frameworkModelResource;
-
     /**
-     * @var
+     * @var ConfigHelper
      */
     private $_klevuConfig;
-
     /**
-     * @var \Magento\CatalogInventory\Api\StockRegistryInterface
+     * @var StockRegistryInterface
      */
     private $stockRegistryInterface;
-
     /**
-     * @var
+     * @var string
      */
     private $isExistsInKlevuProductSync;
 
-    /**
-     * Troubleshoot constructor.
-     * @param Context $mcontext
-     * @param TroubleshootContext $context
-     * @param Klevu_ProductParentInterface $klevuProductParent
-     * @param TroubleshootActions $troubleshootProductAction
-     * @param ProductRepositoryInterface $productRepository
-     * @param Magento_StatusAttribute $magentoStatusAttribute
-     * @param StockRegistryInterface $stockRegistryInterface
-     * @param Registry $registry
-     * @param AbstractResource|null $resource
-     * @param AbstractDb|null $resourceCollection
-     * @param array $data
-     */
     public function __construct(
         Context $mcontext,
         Klevu_TroubleshootContext $context,
@@ -107,8 +72,9 @@ class Troubleshoot extends AbstractModel
         StockRegistryInterface $stockRegistryInterface,
         Registry $registry,
         AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null, array $data = [])
-    {
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
         $this->klevuProductParent = $klevuProductParent;
         $this->troubleshootProductAction = $troubleshootProductAction;
         $this->productRepository = $productRepository;
@@ -123,7 +89,7 @@ class Troubleshoot extends AbstractModel
      * Returns last updated at from catalog_product_entity
      *
      * @param $product_id
-     * @return false
+     * @return string|false
      */
     public function getLastUpdatedAt($product_id)
     {
@@ -131,19 +97,6 @@ class Troubleshoot extends AbstractModel
             return $this->product->getUpdatedAt();
         }
         return false;
-
-        //fallback to check through direct sql query
-        /*$select = $this->getCoreReadConnection()
-            ->select()
-            ->from(["cpe" => $this->_frameworkModelResource->getTableName("catalog_product_entity")])
-            ->where("cpe.entity_id = ?", $product_id)
-            ->order("updated_at DESC")
-            ->limitPage(0, 1);
-        $result = $this->getCoreReadConnection()->fetchRow($select);
-        if (!isset($result['updated_at'])) {
-            return false;
-        }
-        return $result['updated_at'];*/
     }
 
     /**
@@ -162,7 +115,7 @@ class Troubleshoot extends AbstractModel
 
         //By default, any product should have 4 rows(based on customer groups)
         $result = $this->getCoreReadConnection()->fetchRow($select);
-        return !empty($result) ? true : false;
+        return !empty($result);
     }
 
     /**
@@ -185,7 +138,6 @@ class Troubleshoot extends AbstractModel
     public function loadCatalogProduct($store_id, $product_id)
     {
         $this->storeId = $store_id;
-        $this->productId = $product_id;
         try {
             $this->product = $this->productRepository->getById($product_id, false, $store_id);
         } catch (NoSuchEntityException $e) {
@@ -208,7 +160,7 @@ class Troubleshoot extends AbstractModel
         $product_id = $this->product->getId();
         $store_id = $this->storeId;
 
-        $itemGroupIds = $this->parentIds = $parentIds = $this->getParentIds($product_id);
+        $itemGroupIds = $parentIds = $this->getParentIds($product_id);
         //Showing requested product id to table as well
         $itemGroupIds['child'] = $product_id;
 
@@ -229,11 +181,11 @@ class Troubleshoot extends AbstractModel
 
                     $statusDBValue = isset($productAttrData['status']) ? $productAttrData['status'] : NULL;
                     $statusText = $this->magentoStatusAttribute->getOptionText($statusDBValue);
-                    $productStatus = $statusText ? $statusText : $statusDBValue;
+                    $productStatus = $statusText ?: $statusDBValue;
 
                     $visibilityDBValue = isset($productAttrData['visibility']) ? $productAttrData['visibility'] : NULL;
                     $visibilityText = Magento_VisibilityAttribute::getOptionText($visibilityDBValue);
-                    $productVisibility = $visibilityText ? $visibilityText : $visibilityDBValue;
+                    $productVisibility = $visibilityText ?: $visibilityDBValue;
 
                     $productType = isset($productAttrData['type_id']) ? $productAttrData['type_id'] : NULL;
                     $productUpdatedAt = isset($productAttrData['updated_at']) ? $productAttrData['updated_at'] : NULL;
@@ -303,7 +255,6 @@ class Troubleshoot extends AbstractModel
                         $nextAction = 'NONE';
                     }
                 }
-
                 $parentInfo[$itemGroupRow]['itemGroupId'] = $itemGroupId;
                 $parentInfo[$itemGroupRow]['lastSyncKlevu'] = $lastSyncKlevu;
                 $parentInfo[$itemGroupRow]['productStatus'] = $productStatus;
@@ -312,9 +263,9 @@ class Troubleshoot extends AbstractModel
                 $parentInfo[$itemGroupRow]['productUpdatedAt'] = $productUpdatedAt;
                 $parentInfo[$itemGroupRow]['nextAction'] = $nextAction;
                 $parentInfo[$itemGroupRow]['notSyncable'] = $notSyncable;
-
             }
         }
+
         return $parentInfo;
     }
 
@@ -354,6 +305,7 @@ class Troubleshoot extends AbstractModel
         if (!isset($result['last_synced_at'])) {
             return false;
         }
+
         return $result['last_synced_at'];
     }
 
@@ -378,16 +330,16 @@ class Troubleshoot extends AbstractModel
     {
         //reset required here
         $nextAction = '';
-        if (in_array($idToCheck, $response['delete'])) {
+        if (in_array($idToCheck, $response['delete'], true)) {
             $nextAction = 'DELETE';
         }
 
         //empty check required for those marked Disabled, queue for DELETE
-        if (empty($nextAction) && in_array($idToCheck, $response['update'])) {
+        if (empty($nextAction) && in_array($idToCheck, $response['update'], true)) {
             $nextAction = 'UPDATE';
         }
 
-        if (empty($nextAction) && in_array($idToCheck, $response['add'])) {
+        if (empty($nextAction) && in_array($idToCheck, $response['add'], true)) {
             $nextAction = 'ADD';
         }
 

@@ -1,14 +1,8 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
-use Klevu\Search\Model\Product\ProductIndividualInterface as KlevuSearch_ProductIndividual;
 use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
-use Klevu\Troubleshoot\Model\Troubleshoot as TroubleshootModel;
-use Klevu\Troubleshoot\Model\TroubleshootActions;
-use Klevu\Troubleshoot\Model\TroubleshootLoadAttribute;
-use Magento\Backend\Block\Template;
 
 /**
  * Class Status
@@ -16,7 +10,6 @@ use Magento\Backend\Block\Template;
  */
 class Status extends Cell
 {
-
     /**
      * Prepare label
      *
@@ -38,7 +31,7 @@ class Status extends Cell
      */
     public function prepareClassName($value)
     {
-        $className = strtolower($value) == 'enabled' ? 'success' : 'warning';
+        $className = strtolower($value) === 'enabled' ? 'success' : 'warning';
         $statusFlag = strtolower($value) !== 'missing' && is_int($value) && !($value >= 1 && $value <= 2);
         $content = '';
         if ($className === 'success') {
@@ -49,6 +42,4 @@ class Status extends Cell
         $this->prepareContent($content);
         $this->setClassName($className);
     }
-
-
 }

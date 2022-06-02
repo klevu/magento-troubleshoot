@@ -2,13 +2,14 @@
 
 namespace Klevu\Troubleshoot\Controller\Adminhtml\Troubleshoot;
 
-
 use Klevu\Troubleshoot\Block\Adminhtml\TroubleshootResult;
 use Klevu\Troubleshoot\Model\Troubleshoot as TroubleshootModel;
 use Magento\Backend\App\Action;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
@@ -22,24 +23,17 @@ class Post extends Action
      */
     const ADMIN_RESOURCE = 'Klevu_Search::config_search';
     /**
-     * @var Magento\Framework\Data\Form\FormKey\Validator
+     * @var Validator
      */
     protected $formKeyValidator;
     /**
      * @var PageFactory
      */
     private $resultPageFactory;
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-    /**
-     * @var TroubleshootModel
-     */
-    private $troubleshootModel;
 
     /**
      * Post constructor.
+     *
      * @param Action\Context $context
      * @param PageFactory $resultPageFactory
      * @param JsonFactory $resultJsonFactory
@@ -50,12 +44,9 @@ class Post extends Action
         PageFactory $resultPageFactory,
         JsonFactory $resultJsonFactory,
         TroubleshootModel $troubleshootModel
-    )
-    {
+    ) {
         $this->resultPageFactory = $resultPageFactory;
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->troubleshootModel = $troubleshootModel;
-        $this->formKeyValidator = $context->getFormKeyValidator();
+        $this->formKeyValidator = $this->_formKeyValidator;
         parent::__construct($context);
     }
 
@@ -64,27 +55,37 @@ class Post extends Action
      */
     public function execute()
     {
-        if (!$this->getRequest()->isXmlHttpRequest()
-            || !$this->formKeyValidator->validate($this->getRequest())) {
+        $request = $this->getRequest();
+        if (!$request->isXmlHttpRequest() || !$this->_formKeyValidator->validate($request)) {
             $this->_forward('noroute');
+
             return;
         }
-
-        $params = array(
-            'store_id' => (int)$this->getRequest()->getParam('store_id'),
-            'product_id' => (int)$this->getRequest()->getParam('product_id')
-        );
-
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $resultPage = $this->resultPageFactory->create();
+        $resultJson->setData([
+            'blockdata' => $this->getBlockData($request)
+        ]);
 
-        $blockData = $resultPage->getLayout()
-            ->createBlock(TroubleshootResult::class)
-            ->setTemplate('Klevu_Troubleshoot::troubleshoot-result.phtml')
-            ->addData($params)
-            ->toHtml();
-        $resultJson->setData(['blockdata' => $blockData]);
         return $resultJson;
     }
 
+    /**
+     * @param RequestInterface $request
+     *
+     * @return string
+     */
+    private function getBlockData(RequestInterface $request)
+    {
+        $resultPage = $this->resultPageFactory->create();
+
+        $layout = $resultPage->getLayout();
+        $blockData = $layout->createBlock(TroubleshootResult::class);
+        $blockData->setTemplate('Klevu_Troubleshoot::troubleshoot-result.phtml');
+        $blockData->addData([
+            'store_id' => (int)$request->getParam('store_id'),
+            'product_id' => (int)$request->getParam('product_id')
+        ]);
+
+        return $blockData->toHtml();
+    }
 }

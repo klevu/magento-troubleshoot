@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
 
 use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
@@ -11,7 +10,6 @@ use Klevu\Troubleshoot\Block\Adminhtml\Result\Cell;
  */
 class Visibility extends Cell
 {
-
     /**
      * Prepare label
      *
@@ -34,7 +32,6 @@ class Visibility extends Cell
      */
     private function getVisibilityLabel($value)
     {
-        //return $this->getCellAttLabel($value);
         if (empty($value)) {
             return __('Missing');
         }
@@ -72,6 +69,4 @@ class Visibility extends Cell
         $this->prepareContent($content);
         $this->setClassName($className);
     }
-
-
 }

@@ -2,9 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="klevu" translate="label" sortOrder="220">
-            <label>Klevu</label>
-        </tab>
         <section id="klevu_troubleshoot" translate="label" sortOrder="999" showInDefault="1" showInWebsite="0" showInStore="0">
             <class>separator-top</class>
             <label>Data Sync Troubleshooter</label>

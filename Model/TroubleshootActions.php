@@ -131,6 +131,7 @@ class TroubleshootActions extends AbstractModel
     {
         $productAttrData = [];
         $store = $this->getStoreObject($store_id);
+        $this->_storeModelStoreManagerInterface->setCurrentStore($store->getId());
         $productCollection = $this->_magentoCollectionFactory->create();
         /**
          * addAttributeToSelect can optionally accept jointype but here

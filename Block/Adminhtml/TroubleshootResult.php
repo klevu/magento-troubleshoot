@@ -282,7 +282,7 @@ class TroubleshootResult extends Template
     public function getProductIdTableCell($itemGroupId, $productId)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(ItemGroupId::class);
+        $block = $layout->createBlock(ItemGroupId::class);
         $block->setTableCell($itemGroupId, $productId);
 
         return $block->toHtml();
@@ -297,7 +297,7 @@ class TroubleshootResult extends Template
     public function getProductTypeTableCell($productType)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(Type::class);
+        $block = $layout->createBlock(Type::class);
         $block->setTableCell($productType);
 
         return $block->toHtml();
@@ -312,7 +312,7 @@ class TroubleshootResult extends Template
     public function getStatusTableCell($status)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(Result\Cell\Status::class);
+        $block = $layout->createBlock(Result\Cell\Status::class);
         $block->setTableCell($status);
 
         return $block->toHtml();
@@ -327,7 +327,7 @@ class TroubleshootResult extends Template
     public function getVisibilityTableCell($visibility)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(Visibility::class);
+        $block = $layout->createBlock(Visibility::class);
         $block->setTableCell($visibility);
 
         return $block->toHtml();
@@ -344,16 +344,23 @@ class TroubleshootResult extends Template
     public function getLastSyncTableCell($lastSyncKlevu, $productUpdatedAt, $notSyncable)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(LastSync::class);
+        $block = $layout->createBlock(LastSync::class);
         $block->setTableCell($lastSyncKlevu, $productUpdatedAt, $notSyncable);
 
         return $block->toHtml();
     }
 
+    /**
+     * @param $nextAction
+     * @param $notSyncable
+     *
+     * @return string
+     * @throws LocalizedException
+     */
     public function getNextActionTableCell($nextAction, $notSyncable)
     {
         $layout = $this->getLayout();
-        $block =$layout->createBlock(NextAction::class);
+        $block = $layout->createBlock(NextAction::class);
         $block->setTableCell($nextAction, $notSyncable);
 
         return $block->toHtml();

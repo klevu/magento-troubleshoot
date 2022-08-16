@@ -18,6 +18,7 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Troubleshoot extends AbstractModel
 {
@@ -61,6 +62,10 @@ class Troubleshoot extends AbstractModel
      * @var string
      */
     private $isExistsInKlevuProductSync;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     public function __construct(
         Context $mcontext,
@@ -83,6 +88,7 @@ class Troubleshoot extends AbstractModel
         parent::__construct($mcontext, $registry, $resource, $resourceCollection, $data);
         $this->_frameworkModelResource = $context->getResourceConnection();
         $this->_klevuConfig = $context->getHelperManager()->getConfigHelper();
+        $this->storeManager = $context->getStoreManagerInterface();
     }
 
     /**
@@ -384,7 +390,12 @@ class Troubleshoot extends AbstractModel
     public function getProductStockStatus()
     {
         try {
-            return $this->stockRegistryInterface->getProductStockStatus($this->product->getId(), $this->storeId);
+            $store = $this->storeManager->getStore($this->storeId);
+            $websiteId = $store->getWebsiteId();
+            return $this->stockRegistryInterface->getProductStockStatus(
+                $this->product->getId(),
+                $websiteId
+            );
         } catch (\Exception $e) {
             return;
         }

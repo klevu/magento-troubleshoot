@@ -25,10 +25,10 @@ class TroubleshootLoadAttribute extends AbstractModel
         Klevu_TroubleshootContext $context,
         Magento_CollectionFactory $magentoCollectionFactory,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = [],
-        LoadAttributeInterface $loadAttribute = null
+        ?LoadAttributeInterface $loadAttribute = null
     ) {
         parent::__construct($mcontext, $registry, $resource, $resourceCollection, $data);
         $this->loadAttribute = $loadAttribute ?: ObjectManager::getInstance()->get(LoadAttributeInterface::class);

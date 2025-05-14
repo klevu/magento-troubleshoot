@@ -29,10 +29,10 @@ class Delete extends AbstractModel
         Klevu_Factory $klevuFactory,
         Klevu_CommonAction $klevuCommonAction,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = [],
-        MagentoProductActionsInterface $magentoProductActions = null
+        ?MagentoProductActionsInterface $magentoProductActions = null
     ) {
         parent::__construct($mcontext, $registry, $resource, $resourceCollection, $data);
         $this->magentoProductActions = $magentoProductActions ?: ObjectManager::getInstance()->get(MagentoProductActionsInterface::class);

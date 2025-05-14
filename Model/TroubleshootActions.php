@@ -43,8 +43,8 @@ class TroubleshootActions extends AbstractModel
         Klevu_CommonAction $klevuCommonAction,
         Magento_CollectionFactory $magentoCollectionFactory,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($mcontext, $registry, $resource, $resourceCollection, $data);

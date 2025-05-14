@@ -76,8 +76,8 @@ class Troubleshoot extends AbstractModel
         Magento_StatusAttribute $magentoStatusAttribute,
         StockRegistryInterface $stockRegistryInterface,
         Registry $registry,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->klevuProductParent = $klevuProductParent;

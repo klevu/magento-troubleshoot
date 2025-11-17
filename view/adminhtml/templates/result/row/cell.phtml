@@ -1,11 +1,11 @@
-<td class="<?= $block->getClassName() ?>">
+<?php /** @var \Klevu\Troubleshoot\Block\Adminhtml\Result\Cell $block */?>
+<td class="<?= /* @noEscape */ $block->getClassName() ?>">
     <?php if (!empty($block->getContent())): ?>
         <span class="tooltip">
-            <span class="tooltip-toggle"><?= $block->getLabel() ?></span>
-            <span class="tooltip-content"><?= $block->getContent() ?></span>
+            <span class="tooltip-toggle"><?= /* @noEscape */$block->getLabel() ?></span>
+            <span class="tooltip-content"><?= /* @noEscape */$block->getContent() ?></span>
         </span>
     <?php else: ?>
-        <?= $block->getLabel() ?>
+        <?= /* @noEscape */$block->getLabel() ?>
     <?php endif; ?>
 </td>
-

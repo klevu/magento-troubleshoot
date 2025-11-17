@@ -28,7 +28,7 @@ use Magento\Store\Api\Data\StoreInterface;
       action="<?= $block->escapeUrl($block->getFormActionUrl()) ?>" method="POST">
 
     <div class="klevu_troubleshoot_product_form admin__collapsible-block">
-        <input type="hidden" name="form_key" value="<?php echo $block->getFormKey() ?>"/>
+        <input type="hidden" name="form_key" value="<?php /* @noEscape */ echo $block->getFormKey() ?>"/>
 
         <a><?= $block->escapeHtml(__('Data Sync Troubleshooter')) ?></a>
         <p class="kl-mage-troubleshoot-introtext message">
@@ -62,7 +62,7 @@ use Magento\Store\Api\Data\StoreInterface;
                                 <optgroup label="<?= $block->escapeHtml($group) ?>">
                                     <?php foreach ($stores as $store): ?>
                                         <?php /** @var StoreInterface $store */ ?>
-                                        <option value="<?= $store->getId() ?>">
+                                        <option value="<?= /* @noEscape */ $store->getId() ?>">
                                             <?php echo $block->escapeHtml($store->getName()) ?>
                                         </option>
                                     <?php endforeach; ?>

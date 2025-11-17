@@ -12,7 +12,7 @@
     <?php $product = $block->getCatalogProduct(); ?>
     <?php if ($product_id <= 0 || empty($product)): ?>
         <span class="kl-mage-finding-empty error">
-            <?= $block->escapeHtml(__('Product with ID: %1 not found or invalid.', $product_id)) ?>
+            <?= /* @noEscape */ $block->escapeHtml(__('Product with ID: %1 not found or invalid.', $product_id)) ?>
         </span>
     <?php elseif ($block->isConfigurable()): ?>
         <span class="kl-mage-finding-empty error">
@@ -21,45 +21,45 @@
             ) ?>
         </span>
     <?php else: ?>
-        <span class="kl-mage-finding"><?= $block->escapeHtml(__('Product ID: %1', $product_id)) ?></span>
+        <span class="kl-mage-finding"><?= /* @noEscape */ $block->escapeHtml(__('Product ID: %1', $product_id)) ?></span>
         <ul>
-            <li class="kl-mage-underline"><?= __('When was the product last updated in Magento?') ?>
+            <li class="kl-mage-underline"><?= /* @noEscape */ __('When was the product last updated in Magento?') ?>
                 <span class="tooltip">
-                    <span class="tooltip-toggle success"><?= $block->getLastUpdatedAt() ?></span>
+                    <span class="tooltip-toggle success"><?= /* @noEscape */ $block->getLastUpdatedAt() ?></span>
                     <span class="tooltip-content">
-                        <?php echo __('This value comes from your database so the timezone may be different.'); ?>
+                        <?php /* @noEscape */ echo __('This value comes from your database so the timezone may be different.'); ?>
                     </span>
                 </span>
                 <br/>
                 <small>
-                    <?php echo __('This is the <strong>catalog_product_entity: updated_at</strong> database value. Klevu compares this to the \'Last Klevu Sync\' below to determine if the product has changed since the last sync.'); ?>
+                    <?php /* @noEscape */ echo __('This is the <strong>catalog_product_entity: updated_at</strong> database value. Klevu compares this to the \'Last Klevu Sync\' below to determine if the product has changed since the last sync.'); ?>
                 </small>
             </li>
             <li>
-                <?= __('Does the product have a price index value?') ?>
+                <?= /* @noEscape */ __('Does the product have a price index value?') ?>
                 <?php $indexPrice = $block->isExistsInCatalogProductIndexPrice(); ?>
                 <?php $stockStatusText = $block->getCatalogProductIndexPriceText($indexPrice); ?>
-                <span class="<?= $block->getCellClassName($indexPrice) ?>">
-                    <?= $block->getCellAttLabel($indexPrice) ?> <?= $stockStatusText ?>
+                <span class="<?= /* @noEscape */ $block->getCellClassName($indexPrice) ?>">
+                    <?= /* @noEscape */ $block->getCellAttLabel($indexPrice) ?> <?= /* @noEscape */ $stockStatusText ?>
                 </span>
                 <br/>
                 <small>
-                    <?php echo __('This checks whether the product can be found in the <strong>catalog_product_index_price</strong> table. If the product is missing from this native Magento table, it can indicate a reindex requirement or an integrity issue in your data.'); ?>
+                    <?php /* @noEscape */ echo __('This checks whether the product can be found in the <strong>catalog_product_index_price</strong> table. If the product is missing from this native Magento table, it can indicate a reindex requirement or an integrity issue in your data.'); ?>
                 </small>
             </li>
             <li>
-                <?= __('Does the product load correctly?') ?>
+                <?= /* @noEscape */ __('Does the product load correctly?') ?>
                 <?php $objectMethodNote = ''; ?>
                 <?php if ($block->getCollectionMethodStatus()): ?>
                     <?php $loadableStatus = $block->getProductLoadableStatus(); ?>
-                    <span class="<?= $block->getCellClassName($loadableStatus) ?>"><?= $block->getCellAttLabel($loadableStatus) ?></span>
+                    <span class="<?= /* @noEscape */ $block->getCellClassName($loadableStatus) ?>"><?= /* @noEscape */ $block->getCellAttLabel($loadableStatus) ?></span>
                 <?php else: ?>
-                    <span class="success"><?= __('Yes (using Object Method)') ?></span>
-                    <?php $objectMethodNote = __('We detected you are using <a href="%1" target="_blank">Object Method</a>. You may wish to try <a href="%1" target="_blank">Collection Method</a> to speed up your data sync with Klevu.', 'https://help.klevu.com/support/solutions/articles/5000871455-sync-data-using-collection-method/'); ?>
+                    <span class="success"><?= /* @noEscape */ __('Yes (using Object Method)') ?></span>
+                    <?php $objectMethodNote = /* @noEscape */ __('We detected you are using <a href="%1" target="_blank">Object Method</a>. You may wish to try <a href="%1" target="_blank">Collection Method</a> to speed up your data sync with Klevu.', 'https://help.klevu.com/support/solutions/articles/5000871455-sync-data-using-collection-method/'); ?>
                 <?php endif; ?>
                 <br/>
                 <small>
-                    <?php echo __('Klevu will not be able to sync the product if it cannot be loaded, so please check the other elements of this report for more clues on why this might be. ') . $objectMethodNote; ?>
+                    <?php /* @noEscape */ echo __('Klevu will not be able to sync the product if it cannot be loaded, so please check the other elements of this report for more clues on why this might be. ') . $objectMethodNote; ?>
                 </small>
             </li>
         </ul>
@@ -100,13 +100,13 @@
                     <tbody>
                     <?php foreach ($itemGroupCollection as $key => $value): ?>
                         <?php $trClass = $value['notSyncable'] ? __('kl-notsyncable') : __('kl-syncable'); ?>
-                        <tr class="<?= $trClass ?>">
-                            <?= $block->getProductIdTableCell($value['itemGroupId'], $product_id) ?>
-                            <?= $block->getProductTypeTableCell($value['productType']) ?>
-                            <?= $block->getStatusTableCell($value['productStatus']) ?>
-                            <?= $block->getVisibilityTableCell($value['productVisibility']) ?>
-                            <?= $block->getLastSyncTableCell($value['lastSyncKlevu'], $value['productUpdatedAt'], $value['notSyncable']) ?>
-                            <?= $block->getNextActionTableCell($value['nextAction'], $value['notSyncable']) ?>
+                        <tr class="<?= /* @noEscape */$trClass ?>">
+                            <?= /* @noEscape */ $block->getProductIdTableCell($value['itemGroupId'], $product_id) ?>
+                            <?= /* @noEscape */ $block->getProductTypeTableCell($value['productType']) ?>
+                            <?= /* @noEscape */ $block->getStatusTableCell($value['productStatus']) ?>
+                            <?= /* @noEscape */ $block->getVisibilityTableCell($value['productVisibility']) ?>
+                            <?= /* @noEscape */ $block->getLastSyncTableCell($value['lastSyncKlevu'], $value['productUpdatedAt'], $value['notSyncable']) ?>
+                            <?= /* @noEscape */ $block->getNextActionTableCell($value['nextAction'], $value['notSyncable']) ?>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
